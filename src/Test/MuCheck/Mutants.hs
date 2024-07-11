@@ -1,5 +1,5 @@
-{-# LANGUAGE  TupleSections #-}
-module Test.MuCheck.Mutants (programMutants) where
+{-# LANGUAGE  TupleSections, RankNTypes #-}
+module Test.MuCheck.Mutants (programMutants, selectLitOps, selectBLitOps, selectIfElseBoolNegOps, selectGuardedBoolNegOps, selectFnMatches) where
 
 import Language.Haskell.Exts(
     Literal(Int, Char, Frac, String, PrimInt, PrimChar, PrimFloat, PrimDouble, PrimWord, PrimString),
@@ -12,15 +12,56 @@ import Language.Haskell.Exts(
     Name(Symbol, Ident),
     SrcSpanInfo(..),
     SrcSpan(..))
-import Data.Generics (Typeable, mkMp, listify)
-import Data.List(nub, (\\), permutations)
 
-import Test.MuCheck.Tix
+import Data.List(nub, (\\), permutations, subsequences)
+
+
 import Test.MuCheck.MuOp
-import Test.MuCheck.Utils.Syb ( once, relevantOps )
-import Test.MuCheck.Utils.Common
+    ( (==>*),
+      getSpan,
+      mkMpMuOp,
+      same,
+      Decl_,
+      Exp_,
+      GuardedRhs_,
+      Literal_,
+      Module_,
+      MuOp,
+      Mutable,
+      Name_ )
 import Test.MuCheck.Config
+    ( Config(muOp),
+      FnOp(_type, _fns),
+      FnType(FnSymbol, FnIdent),
+      MuVar(..) )
 
+import Data.Generics (Data, GenericM, gmapMo, Typeable, mkMp, listify)
+import Control.Monad (MonadPlus, mplus)
+import Data.Maybe(isJust)
+
+type Span = (Int, Int, Int, Int)
+-- | apply a mutating function on a piece of code one at a time
+-- like somewhere (from so)
+once :: MonadPlus m => GenericM m -> GenericM m
+once f x = f x `mplus` gmapMo (once f) x
+
+-- | The function `relevantOps` does two filters. For the first, it
+-- removes spurious transformations like "Int 1 ~~> Int 1". Secondly, it
+-- tries to apply the transformation to the given program on some element
+-- if it does not succeed, then we discard that transformation.
+relevantOps :: (Data a, Eq a) => a -> [(MuVar, MuOp)] -> [(MuVar, MuOp)]
+relevantOps m oplst = filter (relevantOp m) $ filter (not . same . snd) oplst
+  -- check if an operator can be applied to a program
+  where relevantOp m' (_v, op) = isJust $ once (mkMpMuOp op) m'
+
+-- | convert a tuple with element and second array to an array of
+-- tuples by repeating the first element 
+spread :: (a, [b]) -> [(a, b)]
+spread (a,lst) = map (a,) lst
+
+-- | The `choose` function generates subsets of a given size
+choose :: [a] -> Int -> [[a]]
+choose xs n = filter (\x -> length x == n) $ subsequences xs
 
 -- | Produce all mutants after applying all operators
 programMutants ::
@@ -38,7 +79,7 @@ mutatesN ::
   -> Module_            -- ^ Module to mutate
   -> Int                -- ^ Order of mutation (usually 1 - first order)
   -> [(MuVar, Span, Module_)] -- ^ Returns the mutated module
-mutatesN os ast n = mutatesN' os (MutateOther [], toSpan (0,0,0,0), ast) n
+mutatesN os ast = mutatesN' os (MutateOther [], (0,0,0,0), ast)
   where mutatesN' ops ms 1 = concat [mutate op ms | op <- ops ]
         mutatesN' ops ms c = concat [mutatesN' ops m 1 | m <- mutatesN' ops ms $ pred c]
 
@@ -47,7 +88,7 @@ mutatesN os ast n = mutatesN' os (MutateOther [], toSpan (0,0,0,0), ast) n
 -- E.g.: if the operator is (op = "<" ==> ">") and there are two instances of
 -- "<" in the AST, then it will return two AST with each replaced.
 mutate :: (MuVar, MuOp) -> (MuVar, Span, Module_) -> [(MuVar, Span, Module_)]
-mutate (v, op) (_v, _s, m) = map (v,toSpan $ getSpan op, ) $ once (mkMpMuOp op) m \\ [m]
+mutate (v, op) (_v, _s, m) = map (v, getSpan op, ) $ once (mkMpMuOp op) m \\ [m]
 
 
 -- | Returns all mutation operators
@@ -82,7 +123,7 @@ selectLiteralOps m = selectLitOps m ++ selectBLitOps m
 -- | Look for literal values in AST, and return applicable MuOp transforms.
 -- Unfortunately booleans are not handled here.
 selectLitOps :: Module_ -> [MuOp]
-selectLitOps m = selectValOps isLit convert m
+selectLitOps = selectValOps isLit convert
   where isLit :: Literal_ -> Bool
         isLit Int{} = True
         isLit PrimInt{} = True
@@ -116,7 +157,7 @@ selectLitOps m = selectValOps isLit convert m
 -- > (False, True)
 
 selectBLitOps :: Module_ -> [MuOp]
-selectBLitOps m = selectValOps isLit convert m
+selectBLitOps = selectValOps isLit convert
   where isLit :: Name_ -> Bool
         isLit (Ident _l "True") = True
         isLit (Ident _l "False") = True
@@ -134,7 +175,7 @@ selectBLitOps m = selectValOps isLit convert m
 -- > if True then 0 else 1
 
 selectIfElseBoolNegOps :: Module_ -> [MuOp]
-selectIfElseBoolNegOps m = selectValOps isIf convert m
+selectIfElseBoolNegOps = selectValOps isIf convert
   where isIf :: Exp_ -> Bool
         isIf If{} = True
         isIf _    = False
@@ -152,7 +193,7 @@ selectIfElseBoolNegOps m = selectValOps isIf convert m
 -- > myFn x | not (x == 1) = True
 -- > myFn   | otherwise = False
 selectGuardedBoolNegOps :: Module_ -> [MuOp]
-selectGuardedBoolNegOps m = selectValOps isGuardedRhs convert m
+selectGuardedBoolNegOps = selectValOps isGuardedRhs convert
   where isGuardedRhs :: GuardedRhs_ -> Bool
         isGuardedRhs GuardedRhs{} = True
         convert (GuardedRhs l stmts expr) = [GuardedRhs l s expr | s <- once (mkMp boolNegate) stmts]
@@ -181,7 +222,7 @@ l_ = SrcSpanInfo (SrcSpan "" 0 0 0 0) []
 -- > myFn (x:xs) = False
 
 selectFnMatches :: Module_ -> [MuOp]
-selectFnMatches m = selectValOps isFunct convert m
+selectFnMatches = selectValOps isFunct convert
   where isFunct :: Decl_ -> Bool
         isFunct FunBind{} = True
         isFunct _    = False

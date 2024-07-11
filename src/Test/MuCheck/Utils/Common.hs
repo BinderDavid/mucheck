@@ -81,10 +81,6 @@ hash :: String -> String
 hash s = (if h < 0 then "x" else "y") ++ show (abs h)
   where h = H.hash s
 
--- | convert a tuple with element and second array to an array of
--- tuples by repeating the first element 
-spread :: (a, [b]) -> [(a, b)]
-spread (a,lst) = map (a,) lst
 
 -- | Apply a function to the last of a tuple
 apSnd :: (b -> c) -> (a,b) -> (a,c)

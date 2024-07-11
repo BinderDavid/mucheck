@@ -6,6 +6,7 @@ import qualified Test.MuCheck.Utils.Helpers
 import Test.Hspec
 import System.Random
 import Test.MuCheck.Mutation
+import Test.MuCheck.Mutants
 import Control.Monad (MonadPlus, mplus, mzero)
 import Test.MuCheck.MuOp (mkMpMuOp, MuOp, (==>))
 import Data.Generics (GenericQ, mkQ, Data, Typeable, mkMp, listify)

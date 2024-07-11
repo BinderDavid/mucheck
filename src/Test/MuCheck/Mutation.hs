@@ -79,7 +79,7 @@ genMutantsForSrc ::
      Config                   -- ^ Configuration
   -> String                   -- ^ The module we are mutating
   -> [Mutant] -- ^ Returns the mutants
-genMutantsForSrc config src = map (toMutant . apTh (prettyPrint . withAnn)) $ programMutants config ast
+genMutantsForSrc config src = map (toMutant . apTh (prettyPrint . withAnn)) $ (\(x,y,z) -> (x, toSpan y, z)) <$> programMutants config ast
   where origAst = getASTFromStr src
         (onlyAnn, noAnn) = splitAnnotations origAst
         ast = putDecl origAst noAnn
