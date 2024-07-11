@@ -1,4 +1,4 @@
-{-#  LANGUAGE Rank2Types, TypeSynonymInstances, FlexibleInstances, ConstraintKinds #-}
+{-#  LANGUAGE Rank2Types, FlexibleInstances, ConstraintKinds #-}
 -- | Mutation operators
 module Test.MuCheck.MuOp (MuOp
           , Mutable(..)
@@ -54,15 +54,6 @@ data MuOp = N  (Name_, Name_)
           | G  (GuardedRhs_, GuardedRhs_)
   deriving Eq
 
--- | Apply the given function on the tuple inside MuOp
-apply :: (forall a. (Eq a, G.Typeable a, Show a, Pretty a) => (a,a) -> c) -> MuOp -> c
-apply f (N  m) = f m
-apply f (QN m) = f m
-apply f (QO m) = f m
-apply f (E  m) = f m
-apply f (D  m) = f m
-apply f (L  m) = f m
-apply f (G  m) = f m
 
 -- How do I get the Annotated (a SrcSpanInfo) on apply's signature?
 -- | getSpan retrieve the span as a tuple
@@ -82,11 +73,23 @@ getSpan m = (startLine, startCol, endLine, endCol)
 -- | The function `same` applies on a `MuOP` determining if transformation is
 -- between same values.
 same :: MuOp -> Bool
-same = apply $ uncurry (==)
+same (N (x,y)) = x == y
+same (QN (x,y)) = x == y
+same (QO (x,y)) = x == y
+same (E (x,y)) = x == y
+same (D (x,y)) = x == y
+same (L (x,y)) = x == y
+same (G (x,y)) = x == y
 
 -- | A wrapper over mkMp
 mkMpMuOp :: (MonadPlus m, G.Typeable a) => MuOp -> a -> m a
-mkMpMuOp = apply $ G.mkMp . uncurry (~~>)
+mkMpMuOp (N (x,y)) = G.mkMp (x ~~> y) 
+mkMpMuOp (QN (x,y)) = G.mkMp (x ~~> y) 
+mkMpMuOp (QO (x,y)) = G.mkMp (x ~~> y) 
+mkMpMuOp (E (x,y)) = G.mkMp (x ~~> y) 
+mkMpMuOp (D (x,y)) = G.mkMp (x ~~> y) 
+mkMpMuOp (L (x,y)) = G.mkMp (x ~~> y) 
+mkMpMuOp (G (x,y)) = G.mkMp (x ~~> y) 
 
 -- | Show a specified mutation
 showM :: (Show a1, Show a, Pretty a, Pretty a1) => (a, a1) -> String
@@ -94,7 +97,13 @@ showM (s, t) = "{\n" ++ prettyPrint s ++ "\n} ==> {\n" ++ prettyPrint t ++ "\n}"
 
 -- | MuOp instance for Show
 instance Show MuOp where
-  show = apply showM
+  show  (N p) =  showM p
+  show (QN p) = showM p
+  show (QO p) = showM p
+  show (E p) = showM p
+  show (D p) = showM p
+  show (L p) = showM p
+  show (G p) = showM p
 
 -- | Mutation operation representing translation from one fn to another fn.
 class Mutable a where
@@ -103,7 +112,7 @@ class Mutable a where
 -- | The function `==>*` pairs up the given element with all elements of the
 -- second list, and applies `==>` on them.
 (==>*) :: Mutable a => a -> [a] -> [MuOp]
-(==>*) x lst = map (x ==>) lst
+(==>*) x = map (x ==>)
 
 -- | The function `*==>*` pairs up all elements of first list with all elements
 -- of second list and applies `==>` between them.
