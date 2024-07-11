@@ -2,11 +2,6 @@
 -- | Configuration module
 module Test.MuCheck.Config where
 
--- | The knob controlling if we want first order mutation.
-data GenerationMode
-  = FirstOrderOnly
-  | FirstAndHigherOrder
-  deriving (Eq, Show)
 
 -- | For function mutations, whether the function is a symbol or an identifier
 -- for example,`head` is an identifier while `==` is a symbol.
@@ -92,7 +87,7 @@ data Config = Config {
   , maxNumMutants :: Int
 -- | Generation mode, can be traditional (firstOrder) and
 -- higher order (higher order is experimental)
-  , genMode :: GenerationMode }
+  }
   deriving Show
 
 -- | The default configuration
@@ -107,7 +102,7 @@ defaultConfig = Config {
   , doNegateIfElse = 1.0
   , doNegateGuards = 1.0
   , maxNumMutants = 300
-  , genMode = FirstOrderOnly }
+  }
 
 -- | Enumeration of different variants of mutations
 data MuVar = MutatePatternMatch
