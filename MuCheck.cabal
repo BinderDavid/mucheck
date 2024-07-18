@@ -1,3 +1,4 @@
+cabal-version:       3.4
 name:                MuCheck
 version:             0.4.0.1
 synopsis:            Automated Mutation Testing
@@ -8,14 +9,13 @@ description:         This package defines a mutation analysis library for haskel
                      the testsuite to check whether the difference has been
                      detected.
 homepage:            https://bitbucket.com/osu-testing/mucheck
-license:             GPL-2
+license:             GPL-2.0-or-later
 license-file:        LICENSE
 author:              Duc Lee <ledu@onid.oregonstate.edu>,
                      Rahul Gopinath <rahul@gopinath.org>
 maintainer:          rahul@gopinath.org
 category:            Testing
 build-type:          Simple
-cabal-version:       >= 1.10
 extra-source-files:  changes.md
 
 source-repository    head
@@ -28,14 +28,14 @@ source-repository    this
   tag:               0.4.0.1
 
 library
-  exposed-modules:  Test.MuCheck,
-                    Test.MuCheck.MuOp,
-                    Test.MuCheck.Config,
-                    Test.MuCheck.Interpreter,
-                    Test.MuCheck.Mutation,
-                    Test.MuCheck.Utils.Syb,
-                    Test.MuCheck.Utils.Common,
-                    Test.MuCheck.Utils.Print,
+  exposed-modules:  Test.MuCheck
+                    Test.MuCheck.MuOp
+                    Test.MuCheck.Config
+                    Test.MuCheck.Interpreter
+                    Test.MuCheck.Mutation
+                    Test.MuCheck.Utils.Syb
+                    Test.MuCheck.Utils.Common
+                    Test.MuCheck.Utils.Print
                     Test.MuCheck.TestAdapter
                     Test.MuCheck.TestAdapter.AssertCheck
                     Test.MuCheck.TestAdapter.AssertCheckAdapter
