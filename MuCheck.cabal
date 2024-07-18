@@ -15,7 +15,6 @@ author:              Duc Lee <ledu@onid.oregonstate.edu>,
                      Rahul Gopinath <rahul@gopinath.org>
 maintainer:          rahul@gopinath.org
 category:            Testing
-build-type:          Simple
 extra-doc-files:     changes.md
 
 source-repository    head
