@@ -77,6 +77,12 @@ test-suite spec
   type:             exitcode-stdio-1.0
   hs-source-dirs:   test
   main-is:          Spec.hs
+  other-modules:    Here
+                    Test.MuCheck.MutationSpec
+                    Test.MuCheck.MutationSpec.Helpers
+                    Test.MuCheck.Utils.CommonSpec
+                    Test.MuCheck.Utils.PrintSpec
+                    Test.MuCheck.Utils.SybSpec
   default-language: Haskell2010
   build-depends:    base >=4 && <5,
                     haskell-src-exts >= 1.23,
