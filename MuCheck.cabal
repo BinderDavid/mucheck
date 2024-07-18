@@ -26,7 +26,22 @@ source-repository    this
   location:          https://github.com/vrthra/mucheck.git
   tag:               0.4.0.1
 
+common dependencies
+  build-depends:    base >=4 && <5,
+                    haskell-src-exts >=1.23,
+                    syb >= 0.4.0,
+                    time >= 1.4.0.1,
+                    hint >= 0.3.1.0,
+                    mtl>=2.1.2,
+                    random >= 1.2.1,
+                    directory >= 1.2.0.1,
+                    temporary >= 1.1,
+                    hashable >= 1.2,
+                    hpc >= 0.5.1.1,
+                    template-haskell >= 2.5.0,
+
 library
+  import:           dependencies
   exposed-modules:  Test.MuCheck
                     Test.MuCheck.MuOp
                     Test.MuCheck.Config
@@ -42,18 +57,6 @@ library
                     Test.MuCheck.Utils.Helpers
                     Test.MuCheck.Tix
   ghc-options:      -Wall
-  build-depends:    base >=4 && <5,
-                    haskell-src-exts >=1.23,
-                    syb >= 0.4.0,
-                    time >= 1.4.0.1,
-                    hint >= 0.3.1.0,
-                    mtl>=2.1.2,
-                    random >= 1.2.1,
-                    directory >= 1.2.0.1,
-                    temporary >= 1.1,
-                    hashable >= 1.2,
-                    hpc >= 0.5.1.1,
-                    template-haskell >= 2.5.0
   default-language: Haskell2010
   hs-source-dirs:   src
 
@@ -74,6 +77,7 @@ executable sample-test
   ghc-options:      -fhpc
 
 test-suite spec
+  import:           dependencies
   type:             exitcode-stdio-1.0
   hs-source-dirs:   test
   main-is:          Spec.hs
@@ -84,18 +88,6 @@ test-suite spec
                     Test.MuCheck.Utils.PrintSpec
                     Test.MuCheck.Utils.SybSpec
   default-language: Haskell2010
-  build-depends:    base >=4 && <5,
-                    haskell-src-exts >= 1.23,
-                    syb >= 0.4.0,
-                    time >= 1.4.0.1,
-                    hint >= 0.3.1.0,
-                    mtl>=2.1.2,
-                    hspec>= 2.0,
+  build-depends:    hspec>= 2.0,
                     MuCheck,
-                    random >= 1.2.1,
-                    directory >= 1.2.0.1,
-                    temporary >= 1.1,
-                    hashable >= 1.2,
-                    hpc >= 0.5.1.1,
-                    template-haskell >= 2.5.0
   build-tool-depends: hspec-discover:hspec-discover
