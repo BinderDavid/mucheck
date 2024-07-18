@@ -16,7 +16,7 @@ author:              Duc Lee <ledu@onid.oregonstate.edu>,
 maintainer:          rahul@gopinath.org
 category:            Testing
 build-type:          Simple
-extra-source-files:  changes.md
+extra-doc-files:     changes.md
 
 source-repository    head
   type:              git
