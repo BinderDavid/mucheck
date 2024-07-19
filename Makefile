@@ -4,7 +4,7 @@ build:
 	cabal build
 
 hlint:
-	(cd support; ~/.cabal/bin/hlint `find ../src -name \*.hs`)
+	hlint .
 
 clean-sandbox:
 	- cabal sandbox hc-pkg unregister DMuCheck
