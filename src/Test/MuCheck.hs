@@ -2,7 +2,6 @@
 -- | MuCheck base module
 module Test.MuCheck (mucheck) where
 
-import Control.Monad (liftM)
 import Test.MuCheck.Mutation
 import Test.MuCheck.Config
 import Test.MuCheck.Utils.Common
@@ -44,12 +43,12 @@ sampler ::
   -> [Mutant]            -- ^ The original list of mutation operators
   -> IO [Mutant]            -- ^ Returns the sampled mutation operators
 sampler config mv = do
-  ms <- liftM concat $ mapM (getSampled config mv) [MutatePatternMatch,
-                                                    MutateValues,
-                                                    MutateFunctions,
-                                                    MutateNegateIfElse,
-                                                    MutateNegateGuards,
-                                                    MutateOther []]
+  ms <- concat <$> mapM (getSampled config mv) [MutatePatternMatch,
+                                                MutateValues,
+                                                MutateFunctions,
+                                                MutateNegateIfElse,
+                                                MutateNegateGuards,
+                                                MutateOther []]
   rSample (maxNumMutants config) ms
 
 getSampled :: Config -> [Mutant] -> MuVar -> IO [Mutant]

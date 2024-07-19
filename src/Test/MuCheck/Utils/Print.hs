@@ -3,7 +3,6 @@
 module Test.MuCheck.Utils.Print where
 import Debug.Trace
 import Data.List(intercalate)
-import Control.Monad (liftM)
 
 import GHC.IO.Handle
 import System.IO
@@ -33,7 +32,7 @@ catchOutputStr :: IO a -> IO (a,String)
 catchOutputStr f = do
   isdebug <- lookupEnv "MuDEBUG"
   case isdebug of
-    Just _ -> liftM (,"") f
+    Just _ -> fmap (,"") f
     Nothing -> withSystemTempFile "_mucheck" $ \tmpf tmph -> do
         res <- redirectToHandle f tmph
         str <- readFile tmpf

@@ -5,7 +5,6 @@ module Test.MuCheck.Utils.Common where
 import System.Random
 import Data.List
 import Data.Time.Clock.POSIX (getPOSIXTime)
-import Control.Monad (liftM)
 import qualified Data.Hashable as H
 
 -- | The `choose` function generates subsets of a given size
@@ -69,7 +68,7 @@ genSwapped lst = map (\(x:y:_) -> swapElts x y lst) swaplst
 
 -- | Generate a random seed from the time.
 genRandomSeed :: IO StdGen
-genRandomSeed = liftM (mkStdGen . round) getPOSIXTime
+genRandomSeed = fmap (mkStdGen . round) getPOSIXTime
 
 -- | take a function of two args producing a monadic result, and apply it to
 -- a pair

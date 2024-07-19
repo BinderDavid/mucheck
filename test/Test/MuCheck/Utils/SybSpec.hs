@@ -12,7 +12,7 @@ main = hspec spec
 
 dummySrcLoc = SrcLoc "<unknown>.hs" 15 1
 
-m1 a b = Match (dummySrcLoc)
+m1 a b = Match dummySrcLoc
            (Ident dummySrcLoc a)
            [PApp dummySrcLoc (UnQual dummySrcLoc (Ident dummySrcLoc b)) [],PLit dummySrcLoc (Signless dummySrcLoc) (Int dummySrcLoc 0 "0")]
            (UnGuardedRhs dummySrcLoc (Lit dummySrcLoc (Int dummySrcLoc 1 "1")))
@@ -32,4 +32,4 @@ spec = do
     it "apply a function just once if possible" $ do
       (S.once (mkMp replM) (FunBind dummySrcLoc [m1 "y" "y"]) :: Maybe (Decl SrcLoc)) `shouldBe` Nothing 
     it "should return all possibilities" $ do
-      (S.once (mkMp replM) (FunBind dummySrcLoc [m1 "x" "x"]) :: [(Decl SrcLoc)]) `shouldBe`  ([FunBind dummySrcLoc [m1 "y" "x"], FunBind dummySrcLoc [m1 "x" "y"]] :: [(Decl SrcLoc)])
+      (S.once (mkMp replM) (FunBind dummySrcLoc [m1 "x" "x"]) :: [Decl SrcLoc]) `shouldBe`  ([FunBind dummySrcLoc [m1 "y" "x"], FunBind dummySrcLoc [m1 "x" "y"]] :: [Decl SrcLoc])

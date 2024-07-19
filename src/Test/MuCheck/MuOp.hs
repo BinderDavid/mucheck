@@ -1,4 +1,4 @@
-{-#  LANGUAGE Rank2Types, TypeSynonymInstances, FlexibleInstances, ConstraintKinds #-}
+{-#  LANGUAGE Rank2Types, FlexibleInstances, ConstraintKinds #-}
 -- | Mutation operators
 module Test.MuCheck.MuOp (MuOp
           , Mutable(..)

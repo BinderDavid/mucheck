@@ -8,8 +8,8 @@ class Showx a where
   showx :: a -> String
 
 -- | Temporary holder for easier visualization
-data X = ModuleX (Module_)
-       | DeclX (Decl_)
+data X = ModuleX Module_
+       | DeclX Decl_
        | DeclXs [Decl_]
 
 -- | showx instances

@@ -12,7 +12,7 @@ uncoveredDummy :: Int -> Int
 uncoveredDummy a = 0 + a
 
 {-# ANN sortEmpty "Test" #-}
-sortEmpty = assertCheck $ qsort [] == []
+sortEmpty = assertCheck $ null (qsort [])
 
 {-# ANN sortSorted "Test" #-}
 sortSorted = assertCheck $ qsort [1,2,3,4] == [1,2,3,4]

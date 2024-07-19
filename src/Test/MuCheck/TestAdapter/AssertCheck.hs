@@ -17,6 +17,6 @@ assertCheckResult fn = withCheck $ case fn of
                                                            return AssertSuccess
                                       AssertFailure -> do  putStrLn "Failed"
                                                            return AssertFailure
-  where withCheck f = catch f $ \e -> do   putStrLn $ show (e :: SomeException)
+  where withCheck f = catch f $ \e -> do   print (e :: SomeException)
                                            return AssertFailure
 

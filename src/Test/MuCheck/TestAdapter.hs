@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, MultiParamTypeClasses, FunctionalDependencies #-}
+{-# LANGUAGE DeriveDataTypeable, FunctionalDependencies #-}
 -- | Module for adapting test framekworks
 module Test.MuCheck.TestAdapter where
 

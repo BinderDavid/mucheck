@@ -4,7 +4,7 @@ build:
 	cabal build
 
 hlint:
-	hlint .
+	hlint --ignore-glob=test/Test/MuCheck/MutationSpec.hs --ignore-glob=test/Test/MuCheck/MutationSpec/Helpers.hs .
 
 clean-sandbox:
 	- cabal sandbox hc-pkg unregister DMuCheck

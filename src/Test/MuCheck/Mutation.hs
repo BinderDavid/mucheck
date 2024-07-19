@@ -1,4 +1,4 @@
-{-# LANGUAGE ImpredicativeTypes, Rank2Types, TupleSections, RecordWildCards #-}
+{-# LANGUAGE ImpredicativeTypes, TupleSections, RecordWildCards #-}
 -- | This module handles the mutation of different patterns.
 module Test.MuCheck.Mutation where
 
@@ -12,7 +12,6 @@ import Language.Haskell.Exts(Literal(Int, Char, Frac, String, PrimInt, PrimChar,
         ModuleHead(..), ModuleName(..))
 import Data.Generics (Typeable, mkMp, listify)
 import Data.List(nub, (\\), permutations, partition)
-import Control.Monad (liftM)
 
 import Test.MuCheck.Tix
 import Test.MuCheck.MuOp
@@ -162,7 +161,7 @@ getAnn m s =  [conv name | Ann _l name _exp <- listify isAnn m]
 
 -- | given the module name, return all marked tests
 getAllTests :: String -> IO [String]
-getAllTests modname = liftM allTests $ readFile modname
+getAllTests modname = allTests <$> readFile modname
 
 -- | Given module source, return all marked tests
 allTests :: String -> [String]

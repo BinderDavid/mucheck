@@ -20,7 +20,7 @@ instance Summarizable AssertCheckSummary where
   isOther   _               = False
 
 
-data AssertCheckRun = AssertCheckRun String
+newtype AssertCheckRun = AssertCheckRun String
 
 instance TRun AssertCheckRun AssertCheckSummary where
   genTest _m tstfn = "assertCheckResult " ++ tstfn

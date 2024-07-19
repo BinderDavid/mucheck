@@ -1,11 +1,10 @@
-{-# LANGUAGE TupleSections, MultiWayIf, DeriveDataTypeable, RecordWildCards #-}
+{-# LANGUAGE DeriveDataTypeable, RecordWildCards #-}
 -- | The Interpreter module is responible for invoking the Hint interpreter to
 -- evaluate mutants.
 module Test.MuCheck.Interpreter (evaluateMutants, evalMethod, evalMutant, evalTest, summarizeResults, MutantSummary(..)) where
 
 import qualified Language.Haskell.Interpreter as I
 import Control.Monad.Trans (liftIO)
-import Control.Monad (liftM)
 import Data.Typeable
 import Data.Either (partitionEithers)
 import System.Directory (createDirectoryIfMissing)
@@ -32,7 +31,7 @@ evaluateMutants :: (Show b, Summarizable b, TRun a b) =>
   -> IO (MAnalysisSummary, [MutantSummary])                          -- ^ Returns a tuple of full run summary and individual mutant summary
 evaluateMutants m mutants tests = do
   results <- mapM (evalMutant tests) mutants -- [InterpreterOutput t]
-  let singleTestSummaries = map (summarizeResults m tests) $ zip mutants results
+  let singleTestSummaries = zipWith (curry (summarizeResults m tests)) mutants results
       ma  = fullSummary m tests results
   return (ma, singleTestSummaries)
 
@@ -85,11 +84,11 @@ stopFast fn (x:xs) = do
   case _io v of
     Left r -> do  say (showE r)
                   -- do not append results of the run because mutant was non viable unless it was the last
-                  if xs == []
+                  if null xs
                     then return [v]
                     else stopFast fn xs
     Right out -> if isSuccess out
-      then liftM (v :) $ stopFast fn xs
+      then (v :) <$> stopFast fn xs
       else return [v] -- test failed (mutant detected)
 
 -- | Show error
